@@ -1,9 +1,18 @@
+import { motion } from "framer-motion";
+
 function ProductCard({ title, flavor, description }) {
   return (
-    <div className="bg-white/70 backdrop-blur-lg border border-white/40 rounded-3xl p-6 shadow-xl shadow-pink-100 hover:scale-105 transition duration-300">
+    <motion.div
+      whileHover={{
+        y: -10,
+        scale: 1.03,
+      }}
+      transition={{ duration: 0.3 }}
+      className="bg-white/70 dark:bg-[#0d1118] backdrop-blur-lg border border-white/40 dark:border-white/10 rounded-3xl p-6 shadow-xl shadow-pink-100 dark:shadow-[0_30px_60px_rgba(168,85,247,0.08)] cursor-pointer"
+    >
       <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-pink-300 to-purple-300 mb-5"></div>
 
-      <h2 className="text-2xl font-bold text-gray-800">
+      <h2 className="text-2xl font-bold text-gray-800 dark:text-zinc-100">
         {title}
       </h2>
 
@@ -11,10 +20,10 @@ function ProductCard({ title, flavor, description }) {
         {flavor}
       </p>
 
-      <p className="text-gray-600 mt-4 leading-relaxed">
+      <p className="text-gray-600 dark:text-zinc-300 mt-4 leading-relaxed">
         {description}
       </p>
-    </div>
+    </motion.div>
   );
 }
 

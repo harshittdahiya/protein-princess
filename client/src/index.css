@@ -2,8 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  color-scheme: light dark;
+}
+
+html {
+  transition: background-color 300ms ease, color 300ms ease;
+}
+
 body {
   margin: 0;
   background: #fff8fb;
+  color: #111827;
   font-family: Inter, sans-serif;
+  transition: background-color 300ms ease, color 300ms ease;
 }
+
+html.dark body {
+  background: #05060a;
+  color: #e5e7eb;
+}
+
