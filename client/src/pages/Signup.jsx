@@ -85,6 +85,7 @@ function Signup() {
           {/* NAME */}
           <input
             type="text"
+            autoComplete="name"
             placeholder="Full Name"
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -94,6 +95,7 @@ function Signup() {
           {/* EMAIL */}
           <input
             type="email"
+            autoComplete="email"
             placeholder="Email Address"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -103,6 +105,7 @@ function Signup() {
           {/* PASSWORD */}
           <input
             type="password"
+            autoComplete="new-password"
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}

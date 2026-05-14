@@ -1,10 +1,17 @@
 import axios from "axios";
 
 const DEFAULT_PRODUCTION_API_URL = "https://protein-princess-backend.onrender.com";
+const BLOCKED_API_URLS = new Set([
+  "https://protein-princess.onrender.com",
+  "https://protein-princess.vercel.app",
+]);
+
+const configuredApiUrl = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
 
 export const API_URL =
-  import.meta.env.VITE_API_URL ||
-  (import.meta.env.PROD ? DEFAULT_PRODUCTION_API_URL : "");
+  import.meta.env.PROD && BLOCKED_API_URLS.has(configuredApiUrl)
+    ? DEFAULT_PRODUCTION_API_URL
+    : configuredApiUrl || (import.meta.env.PROD ? DEFAULT_PRODUCTION_API_URL : "");
 
 if (!API_URL) {
   throw new Error("Missing VITE_API_URL. Set it in Vercel and client/.env.");
