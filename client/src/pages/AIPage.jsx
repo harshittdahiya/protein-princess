@@ -42,7 +42,7 @@ function AIPage() {
       setLoading(true);
 
       const { data } = await axios.post(
-        "http://localhost:5000/api/ai/chat",
+        "https://protein-princess.onrender.com/api/ai/chat",
         {
           message: currentMessage,
         }

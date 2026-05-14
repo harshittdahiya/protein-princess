@@ -19,7 +19,7 @@ function Signup() {
     try {
 
       const { data } = await axios.post(
-        "http://localhost:5000/api/auth/signup",
+        "https://protein-princess.onrender.com/api/auth/signup",
         {
           name,
           email,

@@ -32,7 +32,7 @@ function Dashboard() {
     try {
 
       await axios.put(
-        `http://localhost:5000/api/posts/${postId}/like`
+        `https://protein-princess.onrender.com/api/posts/${postId}/like`
       );
 
     } catch (error) {
@@ -51,7 +51,7 @@ function Dashboard() {
       try {
 
         const { data } = await axios.get(
-          "http://localhost:5000/api/posts"
+          "https://protein-princess.onrender.com/api/posts"
         );
 
         setPosts(data);

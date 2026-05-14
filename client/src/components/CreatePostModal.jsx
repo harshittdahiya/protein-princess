@@ -15,7 +15,7 @@ function CreatePostModal({ open, setOpen }) {
       );
 
       await axios.post(
-        "http://localhost:5000/api/posts",
+        "https://protein-princess.onrender.com/api/posts",
         {
           user: userInfo._id,
           name: userInfo.name,
