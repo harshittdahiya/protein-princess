@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import ThemeToggle from "../components/ThemeToggle";
-import axios from "axios";
+import api from "../config/api";
 
 function AIPage() {
 
@@ -41,12 +41,9 @@ function AIPage() {
 
       setLoading(true);
 
-      const { data } = await axios.post(
-        "https://protein-princess.onrender.com/api/ai/chat",
-        {
-          message: currentMessage,
-        }
-      );
+      const { data } = await api.post("/ai/chat", {
+        message: currentMessage,
+      });
 
       // AI RESPONSE
       const aiMessage = {

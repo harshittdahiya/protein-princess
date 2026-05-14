@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import ThemeToggle from "../components/ThemeToggle";
 import { useState } from "react";
-import axios from "axios";
+import api from "../config/api";
 
 function Login() {
 
@@ -17,13 +17,10 @@ function Login() {
 
     try {
 
-      const { data } = await axios.post(
-        "https://protein-princess.onrender.com/api/auth/login",
-        {
-          email,
-          password,
-        }
-      );
+      const { data } = await api.post("/auth/login", {
+        email,
+        password,
+      });
 
       localStorage.setItem(
         "userInfo",

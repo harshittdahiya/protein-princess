@@ -1,8 +1,14 @@
 const Groq = require("groq-sdk");
 
-const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY,
-});
+const getGroqClient = () => {
+  if (!process.env.GROQ_API_KEY) {
+    throw new Error("Missing GROQ_API_KEY environment variable");
+  }
+
+  return new Groq({
+    apiKey: process.env.GROQ_API_KEY,
+  });
+};
 
 
 // AI CHAT CONTROLLER
@@ -12,7 +18,7 @@ const chatWithAI = async (req, res) => {
 
     const { message } = req.body;
 
-    if (!message) {
+    if (!message?.trim()) {
       return res.status(400).json({
         message: "Message is required",
       });
@@ -20,7 +26,7 @@ const chatWithAI = async (req, res) => {
 
     // GROQ RESPONSE
     const completion =
-      await groq.chat.completions.create({
+      await getGroqClient().chat.completions.create({
 
         messages: [
 
@@ -61,7 +67,7 @@ Keep answers:
 
           {
             role: "user",
-            content: message,
+            content: message.trim(),
           },
 
         ],
@@ -79,10 +85,10 @@ Keep answers:
 
   } catch (error) {
 
-    console.log(error);
+    console.error("AI route failed:", error.message);
 
     res.status(500).json({
-      message: "AI failed",
+      message: "AI failed. Please try again shortly.",
     });
 
   }

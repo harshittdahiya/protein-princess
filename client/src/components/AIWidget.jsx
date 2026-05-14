@@ -1,16 +1,9 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../config/api";
 
 function AIWidget() {
-const pathname = window.location.pathname;
-if (
-  pathname === "/login" ||
-  pathname === "/signup"
-) {
-  return null;
-}
   const [open, setOpen] = useState(false);
 
   const [message, setMessage] = useState("");
@@ -25,6 +18,15 @@ if (
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
+
+  const pathname = window.location.pathname;
+
+  if (
+    pathname === "/login" ||
+    pathname === "/signup"
+  ) {
+    return null;
+  }
 
 
   // SEND MESSAGE
@@ -51,12 +53,9 @@ if (
 
       setLoading(true);
 
-      const { data } = await axios.post(
-        "https://protein-princess.onrender.com/api/ai/chat",
-        {
-          message: currentMessage,
-        }
-      );
+      const { data } = await api.post("/ai/chat", {
+        message: currentMessage,
+      });
 
       // AI MESSAGE
       const aiMessage = {

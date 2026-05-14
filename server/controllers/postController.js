@@ -9,7 +9,7 @@ const createPost = async (req, res, io) => {
     const { user, name, content } = req.body;
 
     // VALIDATION
-    if (!user || !name || !content) {
+    if (!user || !name || !content?.trim()) {
       return res.status(400).json({
         message: "Please fill all fields",
       });
@@ -18,13 +18,13 @@ const createPost = async (req, res, io) => {
     // CREATE
     const post = await Post.create({
       user,
-      name,
-      content,
+      name: name.trim(),
+      content: content.trim(),
     });
 
     io.emit("newPost", post);
 
-res.status(201).json(post);
+    res.status(201).json(post);
 
   } catch (error) {
 
@@ -61,18 +61,17 @@ const likePost = async (req, res, io) => {
 
   try {
 
-    const post = await Post.findById(req.params.id);
+    const post = await Post.findByIdAndUpdate(
+      req.params.id,
+      { $inc: { likes: 1 } },
+      { new: true }
+    );
 
     if (!post) {
       return res.status(404).json({
         message: "Post not found",
       });
     }
-
-    // INCREMENT LIKES
-    post.likes += 1;
-
-    await post.save();
 
     // REALTIME EMIT
     io.emit("postLiked", post);

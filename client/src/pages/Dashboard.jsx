@@ -5,8 +5,8 @@ import CreatePostModal from "../components/CreatePostModal";
 import ThemeToggle from "../components/ThemeToggle";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import { io } from "socket.io-client";
+import api from "../config/api";
+import { createSocket } from "../config/socket";
 
 function Dashboard() {
 
@@ -14,8 +14,6 @@ function Dashboard() {
   const [openModal, setOpenModal] = useState(false);
 
   const navigate = useNavigate();
-
-  const socket = io("http://localhost:5000");
 
   // LOGOUT
   const handleLogout = () => {
@@ -31,9 +29,7 @@ function Dashboard() {
 
     try {
 
-      await axios.put(
-        `https://protein-princess.onrender.com/api/posts/${postId}/like`
-      );
+      await api.put(`/posts/${postId}/like`);
 
     } catch (error) {
 
@@ -50,9 +46,7 @@ function Dashboard() {
 
       try {
 
-        const { data } = await axios.get(
-          "https://protein-princess.onrender.com/api/posts"
-        );
+        const { data } = await api.get("/posts");
 
         setPosts(data);
 
@@ -65,6 +59,8 @@ function Dashboard() {
     };
 
     fetchPosts();
+
+    const socket = createSocket();
 
     // NEW POST
     socket.on("newPost", (newPost) => {
@@ -90,6 +86,8 @@ function Dashboard() {
     });
 
     return () => {
+      socket.off("newPost");
+      socket.off("postLiked");
       socket.disconnect();
     };
 

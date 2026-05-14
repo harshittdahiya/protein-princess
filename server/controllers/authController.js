@@ -5,6 +5,10 @@ const jwt = require("jsonwebtoken");
 
 // GENERATE TOKEN
 const generateToken = (id) => {
+  if (!process.env.JWT_SECRET) {
+    throw new Error("Missing JWT_SECRET environment variable");
+  }
+
   return jwt.sign(
     { id },
     process.env.JWT_SECRET,
@@ -28,9 +32,11 @@ if (!name || !email || !password) {
 }
 
 // EMAIL CHECK
+const normalizedEmail = email.toLowerCase().trim();
+
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-if (!emailRegex.test(email)) {
+if (!emailRegex.test(normalizedEmail)) {
   return res.status(400).json({
     message: "Invalid email format",
   });
@@ -44,7 +50,7 @@ if (password.length < 6) {
 }
 
     // CHECK IF USER EXISTS
-    const userExists = await User.findOne({ email });
+    const userExists = await User.findOne({ email: normalizedEmail });
 
     if (userExists) {
       return res.status(400).json({
@@ -59,8 +65,8 @@ if (password.length < 6) {
 
     // CREATE USER
     const user = await User.create({
-      name,
-      email,
+      name: name.trim(),
+      email: normalizedEmail,
       password: hashedPassword,
     });
 
@@ -94,7 +100,7 @@ const loginUser = async (req, res) => {
 }
 
     // FIND USER
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: email.toLowerCase().trim() });
 
     if (!user) {
       return res.status(400).json({

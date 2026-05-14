@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
-import axios from "axios";
+import api from "../config/api";
 
 function CreatePostModal({ open, setOpen }) {
 
@@ -14,14 +14,21 @@ function CreatePostModal({ open, setOpen }) {
         localStorage.getItem("userInfo")
       );
 
-      await axios.post(
-        "https://protein-princess.onrender.com/api/posts",
-        {
-          user: userInfo._id,
-          name: userInfo.name,
-          content,
-        }
-      );
+      if (!userInfo?._id || !userInfo?.name) {
+        alert("Please login again before creating a post");
+        return;
+      }
+
+      if (!content.trim()) {
+        alert("Please write something before posting");
+        return;
+      }
+
+      await api.post("/posts", {
+        user: userInfo._id,
+        name: userInfo.name,
+        content: content.trim(),
+      });
 
       setContent("");
 
