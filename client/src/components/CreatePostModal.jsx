@@ -1,6 +1,42 @@
 import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
+import axios from "axios";
 
 function CreatePostModal({ open, setOpen }) {
+
+  const [content, setContent] = useState("");
+
+  const handlePost = async () => {
+
+    try {
+
+      const userInfo = JSON.parse(
+        localStorage.getItem("userInfo")
+      );
+
+      await axios.post(
+        "http://localhost:5000/api/posts",
+        {
+          user: userInfo._id,
+          name: userInfo.name,
+          content,
+        }
+      );
+
+      setContent("");
+
+      setOpen(false);
+
+    } catch (error) {
+
+      console.log(error);
+
+      alert("Failed to create post");
+
+    }
+
+  };
+
   return (
     <AnimatePresence>
 
@@ -25,6 +61,7 @@ function CreatePostModal({ open, setOpen }) {
             <div className="flex items-center justify-between mb-6">
 
               <div>
+
                 <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
                   Share Progress ✨
                 </h2>
@@ -32,6 +69,7 @@ function CreatePostModal({ open, setOpen }) {
                 <p className="text-gray-500 dark:text-zinc-400 mt-2">
                   Inspire the princess community
                 </p>
+
               </div>
 
               <button
@@ -45,6 +83,8 @@ function CreatePostModal({ open, setOpen }) {
 
             {/* TEXTAREA */}
             <textarea
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
               placeholder="Tell everyone about your progress..."
               className="w-full h-40 rounded-[2rem] border border-pink-100 dark:border-white/10 bg-white dark:bg-[#111827] text-gray-900 dark:text-white p-5 outline-none resize-none focus:ring-2 focus:ring-pink-200 dark:focus:ring-pink-500"
             />
@@ -64,7 +104,10 @@ function CreatePostModal({ open, setOpen }) {
                 Cancel
               </button>
 
-              <button className="flex-1 bg-pink-400 hover:bg-pink-500 text-white py-4 rounded-2xl shadow-lg shadow-pink-200 transition">
+              <button
+                onClick={handlePost}
+                className="flex-1 bg-pink-400 hover:bg-pink-500 text-white py-4 rounded-2xl shadow-lg shadow-pink-200 transition"
+              >
                 Post Update
               </button>
 

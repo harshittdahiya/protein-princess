@@ -1,12 +1,99 @@
 import { motion } from "framer-motion";
-import { useState } from "react";
 import Sidebar from "../components/Sidebar";
 import MobileNav from "../components/MobileNav";
 import CreatePostModal from "../components/CreatePostModal";
 import ThemeToggle from "../components/ThemeToggle";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { io } from "socket.io-client";
 
 function Dashboard() {
+
+  const [posts, setPosts] = useState([]);
   const [openModal, setOpenModal] = useState(false);
+
+  const navigate = useNavigate();
+
+  const socket = io("http://localhost:5000");
+
+  // LOGOUT
+  const handleLogout = () => {
+
+    localStorage.removeItem("userInfo");
+
+    navigate("/");
+
+  };
+
+  // LIKE POST
+  const handleLike = async (postId) => {
+
+    try {
+
+      await axios.put(
+        `http://localhost:5000/api/posts/${postId}/like`
+      );
+
+    } catch (error) {
+
+      console.log(error);
+
+    }
+
+  };
+
+  // FETCH POSTS + SOCKETS
+  useEffect(() => {
+
+    const fetchPosts = async () => {
+
+      try {
+
+        const { data } = await axios.get(
+          "http://localhost:5000/api/posts"
+        );
+
+        setPosts(data);
+
+      } catch (error) {
+
+        console.log(error);
+
+      }
+
+    };
+
+    fetchPosts();
+
+    // NEW POST
+    socket.on("newPost", (newPost) => {
+
+      setPosts((prevPosts) => [
+        newPost,
+        ...prevPosts,
+      ]);
+
+    });
+
+    // LIKE UPDATE
+    socket.on("postLiked", (updatedPost) => {
+
+      setPosts((prevPosts) =>
+        prevPosts.map((post) =>
+          post._id === updatedPost._id
+            ? updatedPost
+            : post
+        )
+      );
+
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#fff8fb] dark:bg-[#05060a] text-black dark:text-white px-4 sm:px-6 lg:px-10 py-6 lg:py-8 overflow-hidden relative transition-all duration-300">
@@ -20,6 +107,7 @@ function Dashboard() {
       <div className="lg:hidden flex items-center justify-between mb-8 relative z-10">
 
         <div>
+
           <h1 className="text-3xl font-bold">
             Protein Princess 👑
           </h1>
@@ -27,6 +115,7 @@ function Dashboard() {
           <p className="text-gray-500 dark:text-zinc-400 mt-1">
             Wellness dashboard
           </p>
+
         </div>
 
         <ThemeToggle />
@@ -53,7 +142,10 @@ function Dashboard() {
           <ThemeToggle />
 
           {/* LOGOUT */}
-          <button className="flex items-center gap-3 bg-gradient-to-r from-pink-500 to-purple-500 hover:scale-105 text-white px-6 py-3 rounded-[1.3rem] shadow-[0_0_18px_rgba(236,72,153,0.22)] transition-all duration-300 font-semibold">
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-3 bg-gradient-to-r from-pink-500 to-purple-500 hover:scale-105 text-white px-6 py-3 rounded-[1.3rem] shadow-[0_0_18px_rgba(236,72,153,0.22)] transition-all duration-300 font-semibold"
+          >
 
             <span className="text-lg">
               🚪
@@ -79,7 +171,6 @@ function Dashboard() {
           {/* STATS */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
 
-            {/* CARD */}
             <motion.div
               whileHover={{ y: -4 }}
               className="bg-white dark:bg-[#0d0f14] border border-pink-100 dark:border-white/5 rounded-[2rem] p-6 transition-all duration-300"
@@ -99,7 +190,6 @@ function Dashboard() {
 
             </motion.div>
 
-            {/* CARD */}
             <motion.div
               whileHover={{ y: -4 }}
               className="bg-white dark:bg-[#0d0f14] border border-pink-100 dark:border-white/5 rounded-[2rem] p-6 transition-all duration-300"
@@ -119,7 +209,6 @@ function Dashboard() {
 
             </motion.div>
 
-            {/* CARD */}
             <motion.div
               whileHover={{ y: -4 }}
               className="bg-white dark:bg-[#0d0f14] border border-pink-100 dark:border-white/5 rounded-[2rem] p-6 transition-all duration-300"
@@ -179,61 +268,66 @@ function Dashboard() {
           </motion.div>
 
           {/* FEED */}
-          <motion.div
-            whileHover={{ y: -4 }}
-            className="bg-white dark:bg-[#0d0f14] border border-pink-100 dark:border-white/5 rounded-[2rem] p-6 transition-all duration-300"
-          >
+          {posts.map((post) => (
 
-            <div className="flex items-center justify-between">
+            <motion.div
+              key={post._id}
+              whileHover={{ y: -4 }}
+              className="bg-white dark:bg-[#0d0f14] border border-pink-100 dark:border-white/5 rounded-[2rem] p-6 transition-all duration-300"
+            >
 
-              <div className="flex items-center gap-4">
+              <div className="flex items-center justify-between">
 
-                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-pink-300 to-purple-300"></div>
+                <div className="flex items-center gap-4">
 
-                <div>
+                  <div className="w-14 h-14 rounded-full bg-gradient-to-br from-pink-300 to-purple-300"></div>
 
-                  <h3 className="text-2xl font-bold">
-                    Aarohi ✨
-                  </h3>
+                  <div>
 
-                  <p className="text-gray-500 dark:text-zinc-500">
-                    2 mins ago
-                  </p>
+                    <h3 className="text-2xl font-bold">
+                      {post.name} ✨
+                    </h3>
+
+                    <p className="text-gray-500 dark:text-zinc-500">
+                      {new Date(post.createdAt).toLocaleString()}
+                    </p>
+
+                  </div>
 
                 </div>
 
+                <button className="text-gray-500 dark:text-zinc-500 text-2xl">
+                  •••
+                </button>
+
               </div>
 
-              <button className="text-gray-500 dark:text-zinc-500 text-2xl">
-                •••
-              </button>
+              <p className="text-gray-700 dark:text-zinc-200 mt-6 text-lg leading-relaxed">
+                {post.content}
+              </p>
 
-            </div>
+              <div className="flex items-center gap-8 mt-6">
 
-            <p className="text-gray-700 dark:text-zinc-200 mt-6 text-lg leading-relaxed">
-              Completed my first full workout week 😭💖
-              Feeling so much more confident already.
-            </p>
+                <button
+                  onClick={() => handleLike(post._id)}
+                  className="text-pink-400 hover:scale-110 transition"
+                >
+                  💖 {post.likes}
+                </button>
 
-            <div className="mt-6 h-64 rounded-[2rem] bg-gradient-to-br from-pink-200/20 via-purple-200/10 to-pink-300/20 dark:from-pink-200/10 dark:via-purple-200/5 dark:to-pink-300/10"></div>
+                <button className="text-gray-700 dark:text-zinc-300 hover:text-pink-400 transition">
+                  💬 0
+                </button>
 
-            <div className="flex items-center gap-8 mt-6">
+                <button className="text-gray-700 dark:text-zinc-300 hover:text-pink-400 transition">
+                  ✨ Share
+                </button>
 
-              <button className="text-pink-400 hover:scale-110 transition">
-                💖 124
-              </button>
+              </div>
 
-              <button className="text-gray-700 dark:text-zinc-300 hover:text-pink-400 transition">
-                💬 18
-              </button>
+            </motion.div>
 
-              <button className="text-gray-700 dark:text-zinc-300 hover:text-pink-400 transition">
-                ✨ Share
-              </button>
-
-            </div>
-
-          </motion.div>
+          ))}
 
         </div>
 
@@ -344,18 +438,18 @@ function Dashboard() {
 
             </div>
 
-    <motion.div
-  animate={{
-    y: [0, -10, 0],
-  }}
-  transition={{
-    duration: 3,
-    repeat: Infinity,
-  }}
-  className="absolute right-8 top-20 text-[90px] opacity-70 pointer-events-none"
->
-  🧴
-</motion.div>
+            <motion.div
+              animate={{
+                y: [0, -10, 0],
+              }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+              }}
+              className="absolute right-8 top-20 text-[90px] opacity-70 pointer-events-none"
+            >
+              🧴
+            </motion.div>
 
           </motion.div>
 

@@ -1,8 +1,50 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import ThemeToggle from "../components/ThemeToggle";
+import { useState } from "react";
+import axios from "axios";
 
 function Signup() {
+
+  const navigate = useNavigate();
+
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleSignup = async (e) => {
+
+    e.preventDefault();
+
+    try {
+
+      const { data } = await axios.post(
+        "http://localhost:5000/api/auth/signup",
+        {
+          name,
+          email,
+          password,
+        }
+      );
+
+      localStorage.setItem(
+        "userInfo",
+        JSON.stringify(data)
+      );
+
+      navigate("/dashboard");
+
+    } catch (error) {
+
+      alert(
+        error.response?.data?.message ||
+        "Signup failed"
+      );
+
+    }
+
+  };
+
   return (
     <div className="relative min-h-screen bg-blush-light dark:bg-[#05060a] flex items-center justify-center px-6 overflow-hidden transition-all duration-300">
 
@@ -38,23 +80,35 @@ function Signup() {
         </div>
 
         {/* FORM */}
-        <form className="space-y-5">
+        <form
+          onSubmit={handleSignup}
+          className="space-y-5"
+        >
 
+          {/* NAME */}
           <input
             type="text"
             placeholder="Full Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             className="w-full px-5 py-4 rounded-2xl border border-pink-100 dark:border-white/5 bg-white dark:bg-[#111827] text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-pink-200 dark:focus:ring-pink-500 transition-all duration-300"
           />
 
+          {/* EMAIL */}
           <input
             type="email"
             placeholder="Email Address"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="w-full px-5 py-4 rounded-2xl border border-pink-100 dark:border-white/5 bg-white dark:bg-[#111827] text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-pink-200 dark:focus:ring-pink-500 transition-all duration-300"
           />
 
+          {/* PASSWORD */}
           <input
             type="password"
             placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             className="w-full px-5 py-4 rounded-2xl border border-pink-100 dark:border-white/5 bg-white dark:bg-[#111827] text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-pink-200 dark:focus:ring-pink-500 transition-all duration-300"
           />
 
