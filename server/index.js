@@ -15,10 +15,18 @@ const app = express();
 
 const server = http.createServer(app);
 
-const allowedOrigins = (process.env.CLIENT_URL || "")
-  .split(",")
-  .map((origin) => origin.trim())
-  .filter(Boolean);
+const defaultClientOrigins = [
+  "https://protein-princess.vercel.app",
+  "https://protein-princess.onrender.com",
+];
+
+const allowedOrigins = [
+  ...defaultClientOrigins,
+  ...(process.env.CLIENT_URL || "")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean),
+];
 
 const corsOptions = {
   origin(origin, callback) {
