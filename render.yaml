@@ -21,3 +21,17 @@ services:
         sync: false
       - key: PORT
         value: 10000
+
+  - type: static
+    name: protein-princess-frontend
+    env: static
+    rootDir: client
+    plan: free
+    buildCommand: npm ci && npm run build
+    publishPath: dist
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: VITE_API_URL
+        value: https://protein-princess-backend.onrender.com

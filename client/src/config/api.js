@@ -1,16 +1,9 @@
 import axios from "axios";
 
-const DEFAULT_PRODUCTION_API_URL = "https://protein-princess-backend.onrender.com";
-
-const configuredApiUrl = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
-
-export const API_URL =
-  import.meta.env.PROD
-    ? DEFAULT_PRODUCTION_API_URL
-    : configuredApiUrl;
+const API_URL = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
 
 if (!API_URL) {
-  throw new Error("Missing VITE_API_URL. Set it in Vercel and client/.env.");
+  throw new Error("Missing VITE_API_URL. Set it in Vercel, Render, or client/.env.");
 }
 
 const api = axios.create({
