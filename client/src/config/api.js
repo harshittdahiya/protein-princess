@@ -1,6 +1,10 @@
 import axios from "axios";
 
-export const API_URL = import.meta.env.VITE_API_URL;
+const DEFAULT_PRODUCTION_API_URL = "https://protein-princess-backend.onrender.com";
+
+export const API_URL =
+  import.meta.env.VITE_API_URL ||
+  (import.meta.env.PROD ? DEFAULT_PRODUCTION_API_URL : "");
 
 if (!API_URL) {
   throw new Error("Missing VITE_API_URL. Set it in Vercel and client/.env.");
